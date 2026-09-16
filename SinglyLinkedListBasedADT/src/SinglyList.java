@@ -168,5 +168,24 @@ public class SinglyList<E> implements ListADT<E> {
         head = null;
         numOfElements = 0;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        Node<E> temp = head;
+
+        for(int i = 0; i < numOfElements; i++){
+            sb.append(temp.getData());
+
+            if(temp.getNext() != null) {
+                sb.append(" -> ");
+            }
+
+            temp = temp.getNext();
+        }
+
+        return sb.toString();
+    }
     
 }
