@@ -1,6 +1,6 @@
 public class LinkedList<T> implements LinkedListADT<T> {
     private Node<T> head;
-    
+    int numOfElements;
 
     public LinkedList() {
         head = null;
@@ -17,29 +17,32 @@ public class LinkedList<T> implements LinkedListADT<T> {
 
     @Override
     public int size() {
+        return size(this.head);
+    }
 
-        if(isEmpty()) {
+    private int size(Node<T> current) {
+
+        if(current == null){
             return 0;
         }
+        return 1 + size(current.getNext());
 
-        if(head.getNext() == null) {
-            return 1;
-        } else {
-            LinkedList<T> newList = new LinkedList<>(head.getNext());
-            return 1 + newList.size();
-        }
     }
 
     @Override
     public T get(int index) {
-        if(index < 0 || index >= size())
+        if(index < 0 || index >= numOfElements)
             throw new IndexOutOfBoundsException("The index is out of range");
 
-        if(index == 0)
-            return head.getData();
+        return get(this.head, index);
+    }
 
-        LinkedList<T> newList = new LinkedList<>(head.getNext());
-        return newList.get(index - 1);
+    private T get (Node<T> current, int index) {
+        if(index == 0)
+            return current.getData();
+
+        return get(current.getNext(), index - 1);
+
     }
 
     @Override
@@ -48,15 +51,18 @@ public class LinkedList<T> implements LinkedListADT<T> {
             throw new IllegalArgumentException("The object o can't be null");
         }
 
-        if(isEmpty())
+        return contains(this.head, o);
+    }
+
+    private boolean contains(Node<T> current, Object o) {
+        if(current == null) 
             return false;
 
-        if(head.getData().equals(o)) {
+        if(current.getData().equals(o))
             return true;
-        } 
 
-        LinkedList<T> newList = new LinkedList<>(head.getNext());
-        return newList.contains(o);
+        return contains(current.getNext(), o);
+        
     }
 
     @Override
@@ -65,21 +71,19 @@ public class LinkedList<T> implements LinkedListADT<T> {
             throw new IllegalArgumentException("The object o can't be null");
         }
 
-        if(head == null) {
+        if(!contains(o))
             return -1;
-        }
-        if(head.getData().equals(o)) {
+
+        return indexOf(this.head, o);
+    }
+
+    private int indexOf(Node<T> current, Object o) {
+
+        if(current.getData().equals(o)){
             return 0;
         }
 
-        LinkedList<T> newList = new LinkedList<>(head.getNext());
-        int index = newList.indexOf(o);
-
-        if(index == -1)
-            return -1;
-
-        else
-            return 1 + index;
+        return 1 + indexOf(current.getNext(), o);
     }
 
     @Override
@@ -90,43 +94,53 @@ public class LinkedList<T> implements LinkedListADT<T> {
 
         if(isEmpty()) {
             head = new Node<>(e);
+            numOfElements++;
             return;
         }
 
-        if(head.getNext() == null) {
+        add(this.head, e);
+        numOfElements++;
+    }
+
+    private void add(Node<T> current, T e){
+
+        if(current.getNext() == null) {
             Node<T> temp = new Node<>(e);
-            head.setNext(temp);
+            current.setNext(temp);
             return;
         }
-
-        LinkedList<T> newList = new LinkedList<>(head.getNext());
-        newList.add(e);
+        add(current.getNext(), e);
     }
 
     @Override
     public void add(int index, T e) {
-        recursiveAddAt(index, e);
-    }
-
-    private Node<T> recursiveAddAt(int index, T e) {
-        if(e == null) {
+        if(e == null) 
             throw new IllegalArgumentException("The object e can't be null");
-        }
-
+        
         if(index < 0 || index > size())
             throw new IndexOutOfBoundsException("The index is out of range");
 
-        if(index == 0) {
-            Node<T> temp = new Node<>(e);
+        if(index == 0){
+            Node<T> temp = new Node<T>(e);
             temp.setNext(head);
             head = temp;
-            return head;
-        } else {
-            LinkedList<T> newList = new LinkedList<>(head.getNext());
-            Node<T> temp = newList.recursiveAddAt(index - 1, e);
-            head.setNext(temp);
-            return head;
+            numOfElements++;
+            return;
         }
+
+        add(this.head, index, e);
+        numOfElements++;
+    }
+
+    private void add(Node<T> current, int index, T e) {
+        
+        if(index-1 == 0) {
+            Node<T> temp = new Node<>(e);
+            temp.setNext(current.getNext());
+            current.setNext(temp);
+            return;
+        } 
+        add(current.getNext(), index - 1, e);
     }
 
     @Override 
@@ -135,54 +149,80 @@ public class LinkedList<T> implements LinkedListADT<T> {
             throw new IllegalArgumentException("The object o can't be null");
         }
 
-        if(!contains(o))
+        if(isEmpty())
             return false;
 
-        recursiveRemove(o);
-        return true;
-    }
-    
-    private Node<T> recursiveRemove(Object o) {
+        if(this.head.getData().equals(o)){
+            this.head = this.head.getNext();
+            numOfElements--;
+            return true;
+        }
+
         
-        if(isEmpty()){
-            return null;
-        }
-
-        if(head.getData().equals(o)) {
-            head = head.getNext();
-            return head;
-        }
-
-        LinkedList<T> newList = new LinkedList<>(head.getNext());
-        Node<T> temp = newList.recursiveRemove(o);
-        head.setNext(temp);
-        return head;
+        boolean isRemoved = remove(this.head, o);
+        if(isRemoved)
+            numOfElements--;
+        return isRemoved;
+        
     }
 
+    private boolean remove(Node<T> current, Object o) {
+        if(current.getNext() == null)
+            return false;
+
+        if(current.getNext().getData().equals(o)) {
+            Node<T> nextNode = current.getNext();
+            current.setNext(nextNode.getNext());
+            return true;
+        }
+        
+        return remove(current.getNext(), o);
+    }
+
+    @Override 
     public T remove(int index) {
 
-        if(index < 0 || index >= size())
+        if(index < 0 || index >= numOfElements)
             throw new IndexOutOfBoundsException("The index is out of range");
 
-        T removedData = get(index);
-        recursiveRemoveAt(index);
-        return removedData;
-    }
-    
-    private Node<T> recursiveRemoveAt(int index) {
-        if(index == 0) {
-            head = head.getNext();
-            return head;
+        if(index == 0){
+            Node<T> temp = this.head;
+            this.head = this.head.getNext();
+            numOfElements--;
+            return temp.getData();
         }
 
-        LinkedList<T> newList = new LinkedList<>(head.getNext());
-        Node<T> temp = newList.recursiveRemoveAt(index - 1);
-        head.setNext(temp);
-        return head;
+        return remove(this.head, index);
+    }
+    
+    private T remove(Node<T> current, int index) {
+        if(index-1 == 0) {
+            Node<T> nextNode = current.getNext();
+            current.setNext(nextNode.getNext());
+            numOfElements--;
+            return nextNode.getData();
+        }
+
+        return remove(current.getNext(), index - 1);
     }
 
     @Override
     public void clear() {
         head = null;
+        numOfElements = 0;
     }
+
+    @Override 
+    public String toString() {
+        return traverse(this.head);
+    }
+
+    private String traverse(Node<T> current){
+
+        if(current == null)
+            return "";
+
+        return current.getData().toString() + " " + traverse(current.getNext());
+    }
+
 }
