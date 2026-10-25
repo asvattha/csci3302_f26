@@ -8,35 +8,37 @@ public class App {
         Student s4 = new Student("Peter", 20);
         Student s5 = new Student("Madison", 35);
 
-        RefQueue<Student> studentStack = new RefQueue<>();
-        System.out.println(studentStack.isEmpty()); // true
-        System.out.println(studentStack.size());// 0
+        //RefQueue<Student> studentQueue = new RefQueue<>();
 
-        studentStack.enqueue(s1); // Kevin
-        studentStack.enqueue(s2); // Kevin, Tyler
-        studentStack.enqueue(s3); // Kevin, Tyler, Sarah
+        CircularQueue<Student> studentQueue = new CircularQueue<>();
+        System.out.println(studentQueue.isEmpty()); // true
+        System.out.println(studentQueue.size());// 0
+
+        studentQueue.enqueue(s1); // Kevin
+        studentQueue.enqueue(s2); // Kevin, Tyler
+        studentQueue.enqueue(s3); // Kevin, Tyler, Sarah
 
         System.out.println("After elements are added onto queue");
-        System.out.println(studentStack);
+        System.out.println(studentQueue);
 
         try {
-            studentStack.dequeue(); // Tyler, Sarah (Kevin is removed)
-            studentStack.dequeue(); // Sarah (Tyler is removed)
+            studentQueue.dequeue(); // Tyler, Sarah (Kevin is removed)
+            studentQueue.dequeue(); // Sarah (Tyler is removed)
         } catch(MyEmptyQueueException ex) {
             ex.getMessage();
         }
 
-        studentStack.enqueue(s4); // Sarah, Peter
-        studentStack.enqueue(s5); // Sarah, Peter, Madison
+        studentQueue.enqueue(s4); // Sarah, Peter
+        studentQueue.enqueue(s5); // Sarah, Peter, Madison
 
-        System.out.println(studentStack.size());
-        System.out.println(studentStack.isEmpty());
+        System.out.println(studentQueue.size());
+        System.out.println(studentQueue.isEmpty());
 
-        System.out.println(studentStack);
+        System.out.println(studentQueue);
 
-        studentStack.removeAll();
-        System.out.println(studentStack.size());
-        System.out.println(studentStack.isEmpty());
+        studentQueue.removeAll();
+        System.out.println(studentQueue.size());
+        System.out.println(studentQueue.isEmpty());
 
     }
 }
